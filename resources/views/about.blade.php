@@ -29,7 +29,7 @@
                         
                         <div class="flex flex-col">
                             <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Hobi</span>
-                            <span class="text-lg font-medium italic">"Ngoding & Web Development"</span>
+                            <span class="text-lg font-medium italic">"Ngoding dan Web Development"</span>
                         </div>
                     </div>
                 </div>

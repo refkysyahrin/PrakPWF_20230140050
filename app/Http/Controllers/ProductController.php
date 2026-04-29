@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Category; // WAJIB DITAMBAHKAN: Import model Category
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreProductRequest;
@@ -14,22 +14,23 @@ class ProductController extends Controller
 {
     public function index()
     {
-        // Menggunakan paginate() menggantikan all() agar fitur pagination berfungsi
-        $products = Product::paginate(10); 
+        // PERBAIKAN: Menggunakan with() agar relasi user dan category diambil bersamaan
+        // Ini mencegah masalah N+1 query dan membuat aplikasi lebih cepat
+        $products = Product::with(['user', 'category'])->paginate(10); 
         return view('product.index', compact('products'));
     }
 
     public function create()
     {
         $users = User::orderBy('name')->get(); 
-        return view('product.create', compact('users'));
+        $categories = Category::all(); // Mengambil semua data kategori untuk dropdown
+        
+        return view('product.create', compact('users', 'categories'));
     }
 
-    // TUGAS 6: Mengganti parameter menjadi StoreProductRequest
+    // Menggunakan parameter StoreProductRequest dari modul 6
     public function store(StoreProductRequest $request)
     {
-        // Validasi sudah otomatis berjalan di background melalui StoreProductRequest.
-        // Kita cukup memanggil $request->validated() untuk mengambil data yang sudah dijamin benar dan aman.
         Product::create($request->validated());
         
         return redirect()->route('product.index')->with('success', 'Product created successfully.');
@@ -46,16 +47,17 @@ class ProductController extends Controller
         Gate::authorize('update', $product);
 
         $users = User::orderBy('name')->get(); 
-        return view('product.edit', compact('product', 'users'));
+        $categories = Category::all(); // Mengambil data kategori untuk dropdown saat diedit
+
+        return view('product.edit', compact('product', 'users', 'categories'));
     }
 
-    // TUGAS 6: Mengganti parameter menjadi UpdateProductRequest
+    // Menggunakan parameter UpdateProductRequest dari modul 6
     public function update(UpdateProductRequest $request, Product $product)
     {
         // IMPLEMENTASI POLICY: Cek apakah user berhak mengedit produk ini
         Gate::authorize('update', $product);
 
-        // Validasi sudah otomatis berjalan melalui UpdateProductRequest.
         $product->update($request->validated());
         
         return redirect()->route('product.index')->with('success', 'Product updated successfully.');

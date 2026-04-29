@@ -11,14 +11,15 @@ class Product extends Model
 
     /**
      * The attributes that are mass assignable.
-     * INI ADALAH BAGIAN YANG PALING PENTING UNTUK MEMPERBAIKI ERROR!
-     * * @var array<int, string>
+     *
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
         'quantity',
         'price',
         'user_id',
+        'category_id', // WAJIB ditambahkan agar kategori bisa disimpan
     ];
 
     /**
@@ -27,5 +28,13 @@ class Product extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the category that owns the product.
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Dedoc\Scramble\Scramble;
 use Illuminate\Routing\Route;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,27 +26,28 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Mendefinisikan Gate 'manage-product' (Tugas Sebelumnya)
-        // Gate ini hanya akan mengembalikan nilai true jika role user adalah 'admin'
         Gate::define('manage-product', function (User $user) {
             return $user->role === 'admin';
         });
 
-        // Mendefinisikan Gate 'manage-category' (Tugas UCP 1)
-        // Membatasi akses rute dan menu Kategori hanya untuk Admin
         Gate::define('manage-category', function (User $user) {
             return $user->role === 'admin';
         });
 
-        // ==========================================
-        // TAMBAHAN MODUL 9: Konfigurasi Scramble API
-        // ==========================================
         Scramble::configure()
             ->routes(function (Route $route) {
                 return Str::startsWith($route->uri, 'api/');
             });
 
-        // Gate untuk melihat dokumentasi API di production
+        // ====================================================
+        // MEMUNCULKAN TOMBOL AUTHORIZE (BEARER TOKEN) DI SCRAMBLE
+        // ====================================================
+        Scramble::extendOpenApi(function (OpenApi $openApi) {
+            $openApi->secure(
+                SecurityScheme::http('bearer')
+            );
+        });
+
         Gate::define('viewApiDocs', function () {
             return true;
         });

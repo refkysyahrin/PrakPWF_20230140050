@@ -9,98 +9,49 @@ use Illuminate\Support\Facades\Log;
 
 class CategoryApiController extends Controller
 {
-    // GET: Menampilkan semua kategori
     public function index()
     {
-        $categories = Category::all();
-        
-        return response()->json([
-            'message' => 'Categories retrieved successfully',
-            'data' => $categories
-        ], 200);
+        return response()->json(['message' => 'Success', 'data' => Category::all()], 200);
     }
 
-    // POST: Menambah kategori baru
     public function store(Request $request)
     {
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255|unique:categories',
-            ]);
-
+            $validated = $request->validate(['name' => 'required|string|max:255|unique:categories']);
             $category = Category::create($validated);
-
-            Log::info('Menambah data kategori API', ['data' => $category]);
-
-            return response()->json([
-                'message' => 'Kategori berhasil ditambahkan!',
-                'data' => $category,
-            ], 201);
+            return response()->json(['message' => 'Kategori berhasil ditambahkan!', 'data' => $category], 201);
         } catch (\Throwable $e) {
-            Log::error('Error saat menambah kategori API', ['message' => $e->getMessage()]);
-            return response()->json(['message' => 'Internal Server Error'], 500);
+            Log::error('Error tambah kategori API', ['msg' => $e->getMessage()]);
+            return response()->json(['message' => 'Error server'], 500);
         }
     }
 
-    // GET: Menampilkan kategori berdasarkan ID
     public function show(int $id)
     {
         $category = Category::find($id);
-
-        if (!$category) {
-            return response()->json(['message' => 'Kategori tidak ditemukan'], 404);
-        }
-
-        return response()->json([
-            'message' => 'Category retrieved successfully',
-            'data' => $category
-        ], 200);
+        if (!$category) return response()->json(['message' => 'Kategori tidak ditemukan'], 404);
+        return response()->json(['message' => 'Success', 'data' => $category], 200);
     }
 
-    // PUT: Mengupdate kategori berdasarkan ID
     public function update(Request $request, int $id)
     {
         try {
             $category = Category::find($id);
+            if (!$category) return response()->json(['message' => 'Kategori tidak ditemukan'], 404);
 
-            if (!$category) {
-                return response()->json(['message' => 'Kategori tidak ditemukan'], 404);
-            }
-
-            $validated = $request->validate([
-                'name' => 'required|string|max:255|unique:categories,name,' . $id,
-            ]);
-
+            $validated = $request->validate(['name' => 'required|string|max:255|unique:categories,name,' . $id]);
             $category->update($validated);
-
-            return response()->json([
-                'message' => 'Kategori berhasil diupdate!',
-                'data' => $category,
-            ], 200);
+            return response()->json(['message' => 'Kategori berhasil diupdate!', 'data' => $category], 200);
         } catch (\Throwable $e) {
-            Log::error('Error saat mengupdate kategori API', ['message' => $e->getMessage()]);
-            return response()->json(['message' => 'Internal Server Error'], 500);
+            return response()->json(['message' => 'Error server'], 500);
         }
     }
 
-    // DELETE: Menghapus kategori berdasarkan ID
     public function destroy(int $id)
     {
-        try {
-            $category = Category::find($id);
-
-            if (!$category) {
-                return response()->json(['message' => 'Kategori tidak ditemukan'], 404);
-            }
-
-            $category->delete();
-
-            return response()->json([
-                'message' => 'Kategori berhasil dihapus!'
-            ], 200);
-        } catch (\Throwable $e) {
-            Log::error('Error saat menghapus kategori API', ['message' => $e->getMessage()]);
-            return response()->json(['message' => 'Internal Server Error'], 500);
-        }
+        $category = Category::find($id);
+        if (!$category) return response()->json(['message' => 'Kategori tidak ditemukan'], 404);
+        $category->delete();
+        return response()->json(['message' => 'Kategori berhasil dihapus!'], 200);
     }
 }

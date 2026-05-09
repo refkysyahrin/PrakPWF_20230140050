@@ -14,19 +14,20 @@
                             </svg>
                         </a>
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Add Category</h2>
-                            <p class="text-sm text-gray-500 mt-0.5">Fill in the details to add a new category</p>
+                            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Edit Category</h2>
+                            <p class="text-sm text-gray-500 mt-0.5">Update details for <span class="font-semibold text-gray-900">{{ $category->name }}</span></p>
                         </div>
                     </div>
 
-                    <form action="{{ route('category.store') }}" method="POST" class="space-y-5">
+                    <form action="{{ route('category.update', $category->id) }}" method="POST" class="space-y-5">
                         @csrf
+                        @method('PUT')
 
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
                                 Category Name <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="name" name="name" value="{{ old('name') }}"
+                            <input type="text" id="name" name="name" value="{{ old('name', $category->name) }}"
                                    placeholder="e.g. Electronics"
                                    class="w-full px-4 py-2.5 rounded-lg border text-sm text-gray-900 placeholder-gray-400
                                    {{ $errors->has('name') ? 'border-red-400 bg-red-50' : 'border-gray-300 bg-white' }}
@@ -42,8 +43,8 @@
                                 Cancel
                             </a>
                             <button type="submit"
-                                    class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition w-full sm:w-auto">
-                                Save Category
+                                    class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-gray text-sm font-medium rounded-lg shadow-sm transition w-full sm:w-auto">
+                                Update Category
                             </button>
                         </div>
                     </form>
